@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  nobrainerdb:
+    build:
+      context: config/docker/postgres/
+      dockerfile: Dockerfile.dev
+    container_name: no-brainer-db-container
+    environment:
+      POSTGRES_USER: no-brainer-db
+      POSTGRES_PASSWORD: no-brainer-db
+      POSTGRES_DB: no-brainer-db
+    ports:
+      - '8907:5432'
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U no-brainer-db']
+      interval: 10s
+      timeout: 5s
+      retries: 5
