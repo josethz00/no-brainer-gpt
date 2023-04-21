@@ -69,13 +69,15 @@ results = index.query(
     include_metadata=True
 )
 
-prompt_gpt = [{'role': 'user', 'content': f"THE QUESTION IS: {query}"}]
-context_gpt = [{'role': 'user', 'content': f"THE CONTEXT IS:"}]
+prompt_gpt = [{'role': 'user', 'content': f"THE QUESTION IS: {query}\n\n"}]
+context_gpt = "THE CONTEXT IS: "
 for match in results['matches']:
-    context_gpt.append({'role': 'user', 'content': f"{match['score']:.3f}: {match['metadata']['text']}"})
+    context_gpt += f"{match['score']:.3f}: {match['metadata']['text']}\n"
     print(f"{match['score']:.3f}: {match['metadata']['text']}")
 
-prompt_gpt.extend(context_gpt)
+prompt_gpt[0]['content'] += context_gpt
+
+print(prompt_gpt)
 
 # Call ChatGPT to generate a response
 response = openai.ChatCompletion.create(
