@@ -91,7 +91,7 @@ response = openai.ChatCompletion.create(
 )
 
 # Print the response
-print(response)
+print('\n\n', response['choices'][0]['message']['content'])
 
 # delete the index data
 index.delete(delete_all=True)
