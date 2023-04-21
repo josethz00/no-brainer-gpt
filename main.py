@@ -1,3 +1,4 @@
+import numpy as np
 import openai
 import pinecone
 import os
@@ -38,11 +39,16 @@ embeddings_api_response = openai.Embedding.create(
 
 embeddings = [record["embedding"] for record in embeddings_api_response["data"]]
 
+batch_size = 500 # set the batch size to 500 because pinecone cannot handle the 1500+ embeddings at once
+
+# Partition the embeddings into batches of 500
+embeddings = np.array_split(embeddings, batch_size)
 # Add the embeddings to the Pinecone index
-index.upsert_many(
-    ids=[str(uuid.uuid4()) for _ in range(len(embeddings))],
-    vectors=embeddings
-)
+for i in range(0, len()
+    to_upsert = zip([uuid.uuid4().hex for _ in embedding], embedding, [element for _ in embedding])
+    index.upsert(
+        vectors=to_upsert,
+    )
 
 query = input("Enter a query: ")
 query_embedding = openai.Embedding.create(
