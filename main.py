@@ -17,11 +17,9 @@ partitioned_text = json.loads(elements_to_json(elements)) # convert partitions i
 filtered_partitioned_text = [element["text"] for element in partitioned_text if "text" in element]
 
 # Create an embedding for a single document using the text-embedding-ada-002 model
-""" embeddings_api_response = openai.Embedding.create(
+embeddings_api_response = openai.Embedding.create(
     input=filtered_partitioned_text,
     engine=MODEL
 )
 
-embeddings = [record["embedding"] for record in embeddings_api_response["data"]] """
-
-print(filtered_partitioned_text)
+embeddings = [record["embedding"] for record in embeddings_api_response["data"]]
