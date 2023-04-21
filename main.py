@@ -11,6 +11,19 @@ load_dotenv()
 openai.api_key = os.getenv("OPEN_AI_API_KEY")
 MODEL = "text-embedding-ada-002"
 
+# Connect Pinecone
+pinecone.init(
+    api_key=os.getenv("PINECONE_API_KEY"),
+    environment=os.getenv("PINECONE_ENV")
+)
+
+# Create a Pinecone index
+if 'nobrainer' not in pinecone.list_indexes():
+    pinecone.create_index('nobrainer', dimension=len(embeds[0]))
+# Connect to the index
+index = pinecone.Index('nobrainer')
+
+
 elements = partition_md(filename="./storage/example.md")
 partitioned_text = json.loads(elements_to_json(elements)) # convert partitions into JSON and load into Python dict
 
@@ -23,15 +36,3 @@ embeddings_api_response = openai.Embedding.create(
 )
 
 embeddings = [record["embedding"] for record in embeddings_api_response["data"]]
-
-# Connect Pinecone
-pinecone.init(
-    api_key=os.getenv("PINECONE_API_KEY"),
-    environment=os.getenv("PINECONE_ENV")
-)
-
-# Create a Pinecone index
-if 'nobrainer' not in pinecone.list_indexes():
-    pinecone.create_index('nobrainer', dimension=len(embeds[0]))
-# Connect to the index
-index = pinecone.Index('nobrainer')
