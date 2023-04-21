@@ -5,6 +5,10 @@ class PineconeVectorDB:
     manager = pinecone
 
     def connect(self, index_name: str = 'nobrainer'):
-        self.index = self.manager.Index(index_name)
+        # Create a Pinecone index
+        if index_name not in pinecone.list_indexes():
+            pinecone.create_index(index_name, dimension=1536) # set 1536 as the dimension of the embeddings, the default of the text-embedding-ada-002 model
+        # Connect to the index
+        self.index = pinecone.Index(index_name)
 
 vector_db = PineconeVectorDB()
