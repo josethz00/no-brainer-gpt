@@ -2,9 +2,9 @@ import fastapi
 
 qa_router = fastapi.APIRouter(prefix="/qa", tags=["qa"])
 
-@qa_router.get(
-    path="/questions",
-    status_code=fastapi.status.HTTP_200_OK,
+@qa_router.post(
+    path="/answer",
+    status_code=fastapi.status.HTTP_201_OK,
 )
-async def get_questions():
+async def generate_answers():
     return {"message": "Hello World"}
