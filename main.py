@@ -2,6 +2,7 @@ import openai
 import pinecone
 import os
 import json
+import uuid
 from dotenv import load_dotenv
 from unstructured.partition.md import partition_md
 from unstructured.staging.base import elements_to_json
@@ -19,7 +20,7 @@ pinecone.init(
 
 # Create a Pinecone index
 if 'nobrainer' not in pinecone.list_indexes():
-    pinecone.create_index('nobrainer', dimension=len(embeds[0]))
+    pinecone.create_index('nobrainer', dimension=1536) # set 1536 as the dimension of the embeddings, the default of the text-embedding-ada-002 model
 # Connect to the index
 index = pinecone.Index('nobrainer')
 
@@ -36,3 +37,25 @@ embeddings_api_response = openai.Embedding.create(
 )
 
 embeddings = [record["embedding"] for record in embeddings_api_response["data"]]
+
+# Add the embeddings to the Pinecone index
+index.upsert_many(
+    ids=[str(uuid.uuid4()) for _ in range(len(embeddings))],
+    vectors=embeddings
+)
+
+query = input("Enter a query: ")
+query_embedding = openai.Embedding.create(
+    input=query,
+    engine=MODEL
+)['data'][0]['embedding']
+
+# Search in the vector database for the closest vector to the query
+results = index.query(
+    [query_embedding],
+    top_k=5,
+    include_metadata=True
+)
+
+for match in results['matches']:
+    print(f"{match['score']:.2f}: {match['metadata']['text']}")
