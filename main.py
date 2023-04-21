@@ -23,3 +23,15 @@ embeddings_api_response = openai.Embedding.create(
 )
 
 embeddings = [record["embedding"] for record in embeddings_api_response["data"]]
+
+# Connect Pinecone
+pinecone.init(
+    api_key=os.getenv("PINECONE_API_KEY"),
+    environment=os.getenv("PINECONE_ENV")
+)
+
+# Create a Pinecone index
+if 'nobrainer' not in pinecone.list_indexes():
+    pinecone.create_index('nobrainer', dimension=len(embeds[0]))
+# Connect to the index
+index = pinecone.Index('nobrainer')
