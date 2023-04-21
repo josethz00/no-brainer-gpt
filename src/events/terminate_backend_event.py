@@ -2,11 +2,10 @@ import typing
 
 import loguru
 import fastapi
+from database.pinecone.vector_db import vector_db
 
 def terminate_backend_server_event_handler(backend_app: fastapi.FastAPI) -> typing.Any:
     @loguru.logger.catch
     async def stop_backend_server_events() -> None:
-        # await dispose_db_connection(backend_app=backend_app)
-        pass
-
+        vector_db.index.close()
     return stop_backend_server_events
