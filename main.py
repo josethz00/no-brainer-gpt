@@ -69,12 +69,13 @@ results = index.query(
     include_metadata=True
 )
 
-prompt_gpt = [{'role': 'user', 'content': f"THE QUESTION IS: {query}\n\n"}]
+prompt_gpt = [{'role': 'user', 'content': f"THE QUESTION IS: '{query}' \n\n"}]
 context_gpt = "THE CONTEXT IS: "
 for match in results['matches']:
     context_gpt += f"{match['score']:.3f}: {match['metadata']['text']}\n"
     print(f"{match['score']:.3f}: {match['metadata']['text']}")
 
+context_gpt += "\n\n IF NECESSARY, complement the answer with your own information, or ask for more information."
 prompt_gpt[0]['content'] += context_gpt
 
 print(prompt_gpt)
