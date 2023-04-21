@@ -8,6 +8,7 @@ from unstructured.staging.base import elements_to_json
 from database.pinecone.vector_db import vector_db
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
+from fastapi import UploadFile, File
 
 class AnswerRequest(BaseModel):
     question: str
@@ -97,4 +98,8 @@ async def generate_answers(answer_request: AnswerRequest):
             "answer": response['choices'][0]['message']['content']
         }
     )
+
+@qa_router.post(path='/upload-files', status_code=fastapi.status.HTTP_201_CREATED)
+async def upload_files(md_files: list[UploadFile] = File(...)):
+    return {"filenames": [file.filename for file in md_files]}
 
