@@ -9,9 +9,6 @@ from unstructured.staging.base import elements_to_json
 
 load_dotenv()
 
-openai.api_key = os.getenv("OPEN_AI_API_KEY")
-MODEL = "text-embedding-ada-002"
-
 # Connect Pinecone
 pinecone.init(
     api_key=os.getenv("PINECONE_API_KEY"),
