@@ -14,5 +14,4 @@ MODEL = "text-embedding-ada-002"
 elements = partition_md(filename="./storage/example.md")
 partitioned_text = json.loads(elements_to_json(elements))
 
-filtered_partitioned_text = [text for text in partitioned_text if text["type"] == "text"]
-print(partitioned_text[0]["text"])
+filtered_partitioned_text = [element for element in partitioned_text if "text" in element]
