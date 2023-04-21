@@ -1,4 +1,3 @@
-import numpy as np
 import openai
 import pinecone
 import os
