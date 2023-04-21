@@ -6,6 +6,10 @@ import openai
 from unstructured.partition.md import partition_md
 from unstructured.staging.base import elements_to_json
 from database.pinecone.vector_db import vector_db
+from pydantic import BaseModel
+
+class AnswerRequest(BaseModel):
+    question: str
 
 qa_router = fastapi.APIRouter(prefix="/qa", tags=["qa"])
 
@@ -13,7 +17,7 @@ qa_router = fastapi.APIRouter(prefix="/qa", tags=["qa"])
     path="/answer",
     status_code=fastapi.status.HTTP_201_CREATED,
 )
-async def generate_answers():
+async def generate_answers(answer_request: AnswerRequest):
     openai.api_key = os.getenv("OPEN_AI_API_KEY")
     MODEL = "text-embedding-ada-002"
 
@@ -47,9 +51,9 @@ async def generate_answers():
         vectors=to_upsert,
     )
 
-    query = input("Enter a query: ")
+    prompt_query = answer_request.question
     query_embedding = openai.Embedding.create(
-        input=query,
+        input=prompt_query,
         engine=MODEL
     )['data'][0]['embedding']
 
@@ -60,7 +64,7 @@ async def generate_answers():
         include_metadata=True
     )
 
-    prompt_gpt = [{'role': 'user', 'content': f"THE QUESTION IS: '{query}' \n\n"}]
+    prompt_gpt = [{'role': 'user', 'content': f"THE QUESTION IS: '{prompt_query}' \n\n"}]
     context_gpt = "THE CONTEXT IS: "
     for match in results['matches']:
         context_gpt += f"{match['score']:.3f}: {match['metadata']['text']}\n"
