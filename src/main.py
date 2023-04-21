@@ -4,6 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from events import terminate_backend_event, execute_backend_event
 from core.router import router
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def initialize_backend_application() -> fastapi.FastAPI:
     app = fastapi.FastAPI()  # type: ignore
