@@ -7,6 +7,7 @@ from unstructured.partition.md import partition_md
 from unstructured.staging.base import elements_to_json
 from database.pinecone.vector_db import vector_db
 from pydantic import BaseModel
+from fastapi.responses import JSONResponse
 
 class AnswerRequest(BaseModel):
     question: str
@@ -90,4 +91,10 @@ async def generate_answers(answer_request: AnswerRequest):
 
     # delete the index data
     vector_db.index.delete(delete_all=True)
+
+    return JSONResponse(
+        content={
+            "answer": response['choices'][0]['message']['content']
+        }
+    )
 
