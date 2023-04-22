@@ -7,3 +7,7 @@ async def connect_pg():
                                  database='no-brainer-db', host='127.0.0.1', port=8907)
     print('connect to postgres')
     return sql_db
+
+async def close_pg():
+    await sql_db.close()
+    print('close postgres')
