@@ -2,6 +2,7 @@ import typing
 import loguru
 import fastapi
 from database.pinecone.vector_db import vector_db
+from database.postgres.sql_db import close_pg
 
 def terminate_backend_server_event_handler(backend_app: fastapi.FastAPI) -> typing.Any:
     @loguru.logger.catch
