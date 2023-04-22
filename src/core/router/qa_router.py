@@ -102,7 +102,7 @@ async def generate_answers(answer_request: AnswerRequest):
 def aa():
     print("aa")
 
-@qa_router.post(path='/upload-files', status_code=fastapi.status.HTTP_201_CREATED)
+@qa_router.post(path='/upload-files', status_code=fastapi.status.HTTP_202_ACCEPTED)
 async def upload_files(md_files: list[UploadFile] = File(...), background_tasks: BackgroundTasks =  None):
     if len(md_files) > 10:
         raise fastapi.HTTPException(status_code=400, detail="Too many files! Max 10 files.")
