@@ -106,3 +106,4 @@ Werkzeug==1.0.1
 wxPython==4.0.7
 pydantic
 python-multipart
+sse-starlette
