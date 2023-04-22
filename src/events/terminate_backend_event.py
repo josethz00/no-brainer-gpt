@@ -1,5 +1,4 @@
 import typing
-
 import loguru
 import fastapi
 from database.pinecone.vector_db import vector_db
