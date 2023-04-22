@@ -108,5 +108,6 @@ async def upload_files(md_files: list[UploadFile] = File(...), background_tasks:
         raise fastapi.HTTPException(status_code=400, detail="Too many files! Max 10 files.")
     if not md_files:
         raise fastapi.HTTPException(status_code=400, detail="No files provided!")
+    background_tasks.add_task(aa)
     return {"filenames": [file.filename for file in md_files], "status": "PROCESSING"}
 
