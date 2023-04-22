@@ -101,5 +101,5 @@ async def generate_answers(answer_request: AnswerRequest):
 
 @qa_router.post(path='/upload-files', status_code=fastapi.status.HTTP_201_CREATED)
 async def upload_files(md_files: list[UploadFile] = File(...)):
-    return {"filenames": [file.filename for file in md_files]}
+    return {"filenames": [file.filename for file in md_files], "status": "PROCESSING"}
 
