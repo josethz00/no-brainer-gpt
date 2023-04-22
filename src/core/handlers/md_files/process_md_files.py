@@ -7,7 +7,7 @@ from unstructured.staging.base import elements_to_json
 from database.pinecone.vector_db import vector_db
 from fastapi import UploadFile
 
-def vectorize_md_files(md_files: list[UploadFile]):
+def process_md_files(md_files: list[UploadFile]):
     openai.api_key = os.getenv("OPEN_AI_API_KEY")
     MODEL = "text-embedding-ada-002"
 
