@@ -1,3 +1,4 @@
+import os
 import fastapi
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
@@ -35,6 +36,7 @@ def initialize_backend_application() -> fastapi.FastAPI:
 backend_app: fastapi.FastAPI = initialize_backend_application()
 
 if __name__ == "__main__":
+    os.environ["PYTHONUNBUFFERED"] = "1"
     uvicorn.run(
         app="main:backend_app",
         host='0.0.0.0',
