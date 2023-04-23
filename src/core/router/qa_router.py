@@ -12,6 +12,7 @@ from database.pinecone.vector_db import vector_db
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 from fastapi import Request, UploadFile, File, BackgroundTasks
+from core.utils.asyncio_mq import asyncio_mq
 
 class AnswerRequest(BaseModel):
     question: str
@@ -102,16 +103,19 @@ async def generate_answers(answer_request: AnswerRequest):
         }
     )
 
-@qa_router.post(path='/upload-files', status_code=fastapi.status.HTTP_202_ACCEPTED)
-async def upload_files(md_files: list[UploadFile] = File(...), background_tasks: BackgroundTasks =  None, request: Request = None):
+@qa_router.post(path='/upload-files/form', status_code=fastapi.status.HTTP_202_ACCEPTED)
+async def upload_files_form(md_files: list[UploadFile] = File(...), background_tasks: BackgroundTasks = None):
     if len(md_files) > 10:
         raise fastapi.HTTPException(status_code=400, detail="Too many files! Max 10 files.")
     if not md_files:
         raise fastapi.HTTPException(status_code=400, detail="No files provided!")
 
-    message_queue = asyncio.Queue()
-    background_tasks.add_task(process_md_files, md_files, message_queue)
+    background_tasks.add_task(process_md_files, md_files, asyncio_mq)
 
+    return {"status": "Processing"}
+
+@qa_router.get(path='/upload-files/stream', status_code=fastapi.status.HTTP_200_OK)
+async def event_stream(request: Request):
     async def event_generator():
         while True:
             # If client closes connection, stop sending events
@@ -119,7 +123,7 @@ async def upload_files(md_files: list[UploadFile] = File(...), background_tasks:
                 break
 
             # Wait for a message to be added to the queue
-            message = await message_queue.get()
+            message = await asyncio_mq.get()
 
             yield {
                 "event": "new_message",
@@ -128,7 +132,9 @@ async def upload_files(md_files: list[UploadFile] = File(...), background_tasks:
                 "data": message,
             }
 
+            if message == "Finished processing all files.":
+                break
+
             await asyncio.sleep(12000)
 
     return EventSourceResponse(event_generator())
-
