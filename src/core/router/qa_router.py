@@ -5,6 +5,7 @@ import fastapi
 import openai
 from unstructured.partition.md import partition_md
 from unstructured.staging.base import elements_to_json
+from handlers.md_files.process_md_files import process_md_files
 from database.pinecone.vector_db import vector_db
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
@@ -108,6 +109,6 @@ async def upload_files(md_files: list[UploadFile] = File(...), background_tasks:
         raise fastapi.HTTPException(status_code=400, detail="Too many files! Max 10 files.")
     if not md_files:
         raise fastapi.HTTPException(status_code=400, detail="No files provided!")
-    background_tasks.add_task(aa)
+    background_tasks.add_task(process_md_files, md_files) # add the task to the background tasks
     return {"filenames": [file.filename for file in md_files], "status": "PROCESSING"}
 
