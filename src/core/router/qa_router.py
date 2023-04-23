@@ -110,7 +110,7 @@ async def upload_files_form(md_files: list[UploadFile] = File(...), background_t
     if not md_files:
         raise fastapi.HTTPException(status_code=400, detail="No files provided!")
 
-    background_tasks.add_task(process_md_files, md_files, asyncio_mq)
+    await process_md_files(md_files, asyncio_mq)
 
     return {"status": "Processing"}
 
@@ -124,6 +124,7 @@ async def event_stream(request: Request):
 
             # Wait for a message to be added to the queue
             message = await asyncio_mq.get()
+            print(message)
 
             yield {
                 "event": "new_message",
@@ -132,7 +133,7 @@ async def event_stream(request: Request):
                 "data": message,
             }
 
-            if message == "Finished processing all files.":
+            if message['message'] == "Finished processing all files.":
                 break
 
             await asyncio.sleep(12000)
