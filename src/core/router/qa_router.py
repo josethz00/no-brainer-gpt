@@ -1,15 +1,17 @@
+import asyncio
 import json
 import os
 import uuid
 import fastapi
 import openai
+from sse_starlette import EventSourceResponse
 from unstructured.partition.md import partition_md
 from unstructured.staging.base import elements_to_json
 from core.handlers.md_files.process_md_files import process_md_files
 from database.pinecone.vector_db import vector_db
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
-from fastapi import UploadFile, File, BackgroundTasks
+from fastapi import Request, UploadFile, File, BackgroundTasks
 
 class AnswerRequest(BaseModel):
     question: str
@@ -101,11 +103,32 @@ async def generate_answers(answer_request: AnswerRequest):
     )
 
 @qa_router.post(path='/upload-files', status_code=fastapi.status.HTTP_202_ACCEPTED)
-async def upload_files(md_files: list[UploadFile] = File(...), background_tasks: BackgroundTasks =  None):
+async def upload_files(md_files: list[UploadFile] = File(...), background_tasks: BackgroundTasks =  None, request: Request = None):
     if len(md_files) > 10:
         raise fastapi.HTTPException(status_code=400, detail="Too many files! Max 10 files.")
     if not md_files:
         raise fastapi.HTTPException(status_code=400, detail="No files provided!")
-    background_tasks.add_task(process_md_files, md_files) # add the task to the background tasks
-    return {"filenames": [file.filename for file in md_files], "status": "PROCESSING"}
+
+    message_queue = asyncio.Queue()
+    background_tasks.add_task(process_md_files, md_files, message_queue)
+
+    async def event_generator():
+        while True:
+            # If client closes connection, stop sending events
+            if await request.is_disconnected():
+                break
+
+            # Wait for a message to be added to the queue
+            message = await message_queue.get()
+
+            yield {
+                "event": "new_message",
+                "id": "message_id",
+                "retry": 12000,
+                "data": message,
+            }
+
+            await asyncio.sleep(12000)
+
+    return EventSourceResponse(event_generator())
 
