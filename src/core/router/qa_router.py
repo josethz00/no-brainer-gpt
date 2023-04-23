@@ -5,7 +5,7 @@ import fastapi
 import openai
 from unstructured.partition.md import partition_md
 from unstructured.staging.base import elements_to_json
-from handlers.md_files.process_md_files import process_md_files
+from core.handlers.md_files.process_md_files import process_md_files
 from database.pinecone.vector_db import vector_db
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse

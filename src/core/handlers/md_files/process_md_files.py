@@ -12,12 +12,12 @@ def process_md_files(md_files: list[UploadFile]):
         openai.api_key = os.getenv("OPEN_AI_API_KEY")
         MODEL = "text-embedding-ada-002"
 
-        elements = partition_md(file=md_file) # partition the markdown file
+        elements = partition_md(file=md_file.file) # partition the markdown file
         partitioned_text = json.loads(elements_to_json(elements)) # convert partitions into JSON and load into Python dict
 
         filtered_partitioned_text = [element["text"] for element in partitioned_text if "text" in element]
-
         batch_size = 500 # set the batch size to 500 because pinecone cannot handle the 1500+ embeddings at once
+
         # Add the embeddings to the Pinecone index
         for i in range(0, len(filtered_partitioned_text), batch_size):
             # Create an embedding for a single document using the text-embedding-ada-002 model
@@ -41,3 +41,5 @@ def process_md_files(md_files: list[UploadFile]):
         vector_db.index.upsert(
             vectors=to_upsert,
         )
+
+    print("Finished processing markdown files.")
