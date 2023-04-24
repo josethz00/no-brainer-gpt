@@ -12,7 +12,6 @@ from database.pinecone.vector_db import vector_db
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 from fastapi import Request, UploadFile, File, BackgroundTasks
-from core.utils.asyncio_mq import asyncio_mq
 
 asyncio_mq = asyncio.Queue()
 
