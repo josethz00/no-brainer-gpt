@@ -35,7 +35,7 @@ async def generate_answers(answer_request: AnswerRequest):
 
     batch_size = 500 # set the batch size to 500 because pinecone cannot handle the 1500+ embeddings at once
     # Add the embeddings to the Pinecone index
-    for i in range(0, len(filtered_partitioned_text), batch_size):
+    for _ in range(0, len(filtered_partitioned_text), batch_size):
         # Create an embedding for a single document using the text-embedding-ada-002 model
         embeddings_api_response = openai.Embedding.create(
             input=filtered_partitioned_text,

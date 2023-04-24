@@ -7,7 +7,6 @@ from unstructured.partition.md import partition_md
 from unstructured.staging.base import elements_to_json
 from database.pinecone.vector_db import vector_db
 from fastapi import UploadFile
-from database.postgres import sql_db
 
 async def process_md_files(md_files: list[UploadFile], asyncio_queue: asyncio.Queue):
     current_file = 0
@@ -23,7 +22,7 @@ async def process_md_files(md_files: list[UploadFile], asyncio_queue: asyncio.Qu
         batch_size = 500  # set the batch size to 500 because pinecone cannot handle the 1500+ embeddings at once
 
         # Add the embeddings to the Pinecone index
-        for i in range(0, len(filtered_partitioned_text), batch_size):
+        for _ in range(0, len(filtered_partitioned_text), batch_size):
             # Create an embedding for a single document using the text-embedding-ada-002 model
             embeddings_api_response = openai.Embedding.create(
                 input=filtered_partitioned_text,
