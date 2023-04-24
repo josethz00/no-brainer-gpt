@@ -55,12 +55,5 @@ async def process_md_files(md_files: list[UploadFile], asyncio_queue: asyncio.Qu
         await asyncio_queue.put(f"Processed {current_file} of {len(md_files)} files.")
         print(f"Processed {current_file} of {len(md_files)} files.")
 
-<<<<<<< HEAD
-        await message_queue.put({
-            "message": "Finished processing all files.",
-            "status": f"Done. {len(md_files)/len(md_files)} files processed."
-        })
-=======
     print("Finished processing all files.")
     await asyncio_queue.put("Finished processing all files.")
->>>>>>> feat/sse
