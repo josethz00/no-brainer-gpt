@@ -12,11 +12,6 @@ from database.postgres import sql_db
 async def process_md_files(md_files: list[UploadFile], asyncio_queue: asyncio.Queue):
     current_file = 0
 
-    #for md_file in md_files:
-    #   await sql_db.sql_db.execute(
-    #        "INSERT INTO jobs (job_status) VALUES ($1)", "PROCESSING"
-    #   )
-
     for md_file in md_files:
         openai.api_key = os.getenv("OPEN_AI_API_KEY")
         MODEL = "text-embedding-ada-002"
