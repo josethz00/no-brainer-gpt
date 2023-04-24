@@ -3,18 +3,25 @@ import os
 import uuid
 import openai
 import asyncio
-from unstructured.partition.md import partition_md
+from unstructured.partition.auto import partition
 from unstructured.staging.base import elements_to_json
 from database.pinecone.vector_db import vector_db
 from fastapi import UploadFile
+from database.postgres import sql_db
 
-async def process_md_files(md_files: list[UploadFile], message_queue: asyncio.Queue):
+async def process_md_files(md_files: list[UploadFile], asyncio_queue: asyncio.Queue):
     current_file = 0
+
+    #for md_file in md_files:
+    #   await sql_db.sql_db.execute(
+    #        "INSERT INTO jobs (job_status) VALUES ($1)", "PROCESSING"
+    #   )
+
     for md_file in md_files:
         openai.api_key = os.getenv("OPEN_AI_API_KEY")
         MODEL = "text-embedding-ada-002"
 
-        elements = partition_md(file=md_file.file)  # partition the markdown file
+        elements = partition(file=md_file.file)  # partition the markdown file
         partitioned_text = json.loads(elements_to_json(elements))  # convert partitions into JSON and load into Python dict
 
         filtered_partitioned_text = [element["text"] for element in partitioned_text if "text" in element]
@@ -45,14 +52,8 @@ async def process_md_files(md_files: list[UploadFile], message_queue: asyncio.Qu
             vectors=to_upsert,
         )
         current_file += 1
-        await message_queue.put({
-            "message": f"Finished processing {md_file.filename}.",
-            "status": f"Processed {current_file} of {len(md_files)} files."
-        })
+        await asyncio_queue.put(f"Processed {current_file} of {len(md_files)} files.")
         print(f"Processed {current_file} of {len(md_files)} files.")
 
-    await message_queue.put({
-        "message": "Finished processing all files.",
-        "status": f"Done. {len(md_files)/len(md_files)} files processed."
-    })
     print("Finished processing all files.")
+    await asyncio_queue.put("Finished processing all files.")
