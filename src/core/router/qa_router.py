@@ -14,6 +14,8 @@ from fastapi.responses import JSONResponse
 from fastapi import Request, UploadFile, File, BackgroundTasks
 from core.utils.asyncio_mq import asyncio_mq
 
+asyncio_mq = asyncio.Queue()
+
 class AnswerRequest(BaseModel):
     question: str
 
@@ -124,18 +126,17 @@ async def event_stream(request: Request):
 
             # Wait for a message to be added to the queue
             message = await asyncio_mq.get()
-            print(message)
 
             yield {
                 "event": "new_message",
                 "id": "message_id",
-                "retry": 12000,
+                "retry": 4000,
                 "data": message,
             }
 
-            if message['message'] == "Finished processing all files.":
+            if message == "Finished processing all files.":
                 break
 
-            await asyncio.sleep(12000)
+            await asyncio.sleep(4000)
 
     return EventSourceResponse(event_generator())
