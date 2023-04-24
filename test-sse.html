@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server-Sent Events Test</title>
+</head>
+<body>
+    <div id="output"></div>
+    <script>
+        window.onload = () => {
+            console.log("Window loaded.")
+
+            const form = new FormData();
+            form.append("md_files", new Blob(["File content 1"], {type: "text/plain"}), "file1.txt");
+            form.append("md_files", new Blob(["File content 2"], {type: "text/plain"}), "file2.txt");
+
+            fetch("http://localhost:5001/qa/upload-files/form", {
+                method: "POST",
+                body: form
+            }).then(response => {
+                if (response.ok) {
+                    console.log('aaaaa')
+                    const source = new EventSource("http://localhost:5001/qa/upload-files/stream");
+                    source.onmessage = (event) => {
+                        console.log(`Data: ${event.data}`);
+                        const output = document.getElementById("output");
+                        const p = document.createElement("p");
+                        p.textContent = event.data;
+                        output.appendChild(p);
+                    };
+                    source.onerror = (event) => {
+                        console.error("EventSource failed.");
+                    };
+                } else {
+                    console.error("Request failed.");
+                }
+            });
+        };
+    </script>
+</body>
+</html>
