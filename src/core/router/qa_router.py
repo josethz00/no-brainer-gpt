@@ -139,3 +139,25 @@ async def event_stream(request: Request):
             await asyncio.sleep(4000)
 
     return EventSourceResponse(event_generator())
+
+@qa_router.get(path='/search', status_code=fastapi.status.HTTP_200_OK)
+async def search(search_term: str):
+    # generate embeddings for the search term
+    openai.api_key = os.getenv("OPEN_AI_API_KEY")
+    MODEL = "text-embedding-ada-002"
+
+    search_term_embeddings = openai.Embedding.create(
+        input=search_term,
+        engine=MODEL
+    )['data'][0]['embedding']
+
+    # Search in the vector database for the closest vector to the query
+    results = vector_db.index.query(
+        [search_term_embeddings],
+        top_k=15,
+        include_metadata=True
+    )
+
+    return {
+        "results": results['matches']
+    }
