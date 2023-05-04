@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search API Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 30vh;
+            background-color: #f5f5f5;
+        }
+
+        .search-box {
+            display: flex;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 8px;
+            background-color: #fff;
+        }
+
+        .search-box input[type="text"] {
+            border: none;
+            outline: none;
+            width: 250px;
+            font-size: 16px;
+        }
+
+        .search-box button {
+            border: none;
+            outline: none;
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 6px 12px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .search-box button:hover {
+            background-color: #45a049;
+        }
+
+        .results-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .results-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .results-list li {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .results-list li:last-child {
+            border-bottom: none;
+        }
+    </style>
+    <script>
+        function searchAPI() {
+            const query = document.getElementById("search-input").value;
+            const url = `http://localhost:5001/qa/search?search_term=${encodeURIComponent(query)}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    displayResults(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        function displayResults(data) {
+            const resultsList = document.getElementById("results-list");
+            resultsList.innerHTML = "";
+
+            data.forEach(item => {
+                const listItem = document.createElement("li");
+                listItem.textContent = item;
+                resultsList.appendChild(listItem);
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="search-container">
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="Search...">
+            <button onclick="searchAPI()">Search</button>
+        </div>
+    </div>
+    <div class="results-container">
+        <ul id="results-list" class="results-list"></ul>
+    </div>
+</body>
+</html>
