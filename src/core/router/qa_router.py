@@ -158,6 +158,14 @@ async def search(search_term: str):
         include_metadata=True
     )
 
+    json_results = []
+
+    for match in results['matches']:
+        json_results.append({
+            "score": match['score'],
+            "text": match['metadata']['text']
+        })
+
     return {
         "results": results['matches']
     }
