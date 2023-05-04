@@ -73,7 +73,7 @@
     <script>
         function searchAPI() {
             const query = document.getElementById("search-input").value;
-            const url = `http://localhost:5001/api/search?q=${encodeURIComponent(query)}`;
+            const url = `http://localhost:5001/qa/search?search_term=${encodeURIComponent(query)}`;
 
             fetch(url)
                 .then(response => response.json())
