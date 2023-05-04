@@ -1,6 +1,6 @@
 # Math for devs - Relational Algebra
 
-Do you remember set theory? A math topic that you probably learned in elementary school, revisited in high school, and 
+Do you remember set theory? A math topic that you probably learned in elementary school, revisited in high school, and
 then never again? Well, it's time to revisit it. Relational Algebra is a formal language based on set theory, and it's
 purpose is to query and manipulate data.
 
