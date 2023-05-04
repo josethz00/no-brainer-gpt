@@ -167,5 +167,5 @@ async def search(search_term: str):
         })
 
     return {
-        "results": results['matches']
+        "results": json_results
     }
