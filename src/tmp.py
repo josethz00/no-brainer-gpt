@@ -21,6 +21,9 @@ if 'nobrainer' not in pinecone.list_indexes():
 # Connect to the index
 index = pinecone.Index('nobrainer')
 
+index.delete(delete_all=True)
+
+exit()
 
 elements = partition_md(filename="./storage/example.md")
 partitioned_text = json.loads(elements_to_json(elements)) # convert partitions into JSON and load into Python dict

@@ -111,7 +111,7 @@ async def upload_files_form(md_files: list[UploadFile] = File(...), background_t
     if not md_files:
         raise fastapi.HTTPException(status_code=400, detail="No files provided!")
 
-    await process_md_files(md_files, asyncio_mq)
+    background_tasks.add_task(process_md_files, md_files=md_files, asyncio_queue=asyncio_mq)
 
     return {"status": "Processing"}
 
