@@ -12,6 +12,7 @@ from database.pinecone.vector_db import vector_db
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 from fastapi import Request, UploadFile, File, BackgroundTasks
+import uuid
 
 asyncio_mq = asyncio.Queue()
 
@@ -119,24 +120,25 @@ async def upload_files_form(md_files: list[UploadFile] = File(...), background_t
 async def event_stream(request: Request):
     async def event_generator():
         while True:
-            # If client closes connection, stop sending events
+            print('aaaa')
             if await request.is_disconnected():
+                print("something disconnected.")
                 break
 
-            # Wait for a message to be added to the queue
-            message = await asyncio_mq.get()
+            if not asyncio_mq.empty():
+                message = await asyncio_mq.get()
+                print(f"Retrieved message from queue: {message}")
+                yield {
+                    "event": "message",
+                    "id": uuid.uuid4(),
+                    "retry": 4000,
+                    "data": message,
+                }
 
-            yield {
-                "event": "new_message",
-                "id": "message_id",
-                "retry": 4000,
-                "data": message,
-            }
+                if message == "Finished processing all files.":
+                    break
 
-            if message == "Finished processing all files.":
-                break
-
-            await asyncio.sleep(4000)
+                await asyncio.sleep(4)
 
     return EventSourceResponse(event_generator())
 
