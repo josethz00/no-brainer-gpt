@@ -42,6 +42,8 @@ async def generate_answers(answer_request: AnswerRequest):
         include_metadata=True
     )
 
+    print(results)
+
     prompt_gpt = [{'role': 'user', 'content': f"THE QUESTION IS: '{prompt_query}' \n\n"}]
     context_gpt = "THE CONTEXT IS: "
     for match in results['matches']:
@@ -65,9 +67,6 @@ async def generate_answers(answer_request: AnswerRequest):
 
     # Print the response
     print('\n\n', response['choices'][0]['message']['content'])
-
-    # delete the index data
-    vector_db.index.delete(delete_all=True)
 
     return JSONResponse(
         content={
